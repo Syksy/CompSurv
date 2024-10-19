@@ -29,7 +29,7 @@ stackprop <- function(
 	...
 ){
 	# Calculate proportions
-	props <- props(x=x, times=times, xs=xs)
+	props <- CompSurv:::props(x=x, times=times, xs=xs)
 
 	# Make sure to use x as a factor
 	x <- factor(x)
@@ -53,7 +53,7 @@ polygonprop <- function(
 ){
 
 	# Create stacked proportions matrix
-	stackmat <- stackprop(x = x, times = times, xs = xs, leftover = leftover)
+	stackmat <- CompSurv:::stackprop(x = x, times = times, xs = xs, leftover = leftover)
 
 	# Create a "zero" line
 	stackmat <- rbind(0, stackmat)
