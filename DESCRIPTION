@@ -1,7 +1,7 @@
 Package: CompSurv
-Title: Competing survival models
-Version: 0.0.1
-Date: 2024-10-18
+Title: Competing survival models and visualizations
+Version: 0.0.3
+Date: 2024-11-04
 Authors@R: c(person("Teemu Daniel", "Laajala", email = "teelaa@utu.fi", 
         role = c("aut", "cre"), comment = c(ORCID = "0000-0002-7016-7354")))
 Description: To be added

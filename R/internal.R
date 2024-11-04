@@ -39,6 +39,7 @@ stackprop <- function(
 	for(r in 1:(nrow(propmat)-1)){
 		propmat[r,] <- unlist(props[[r]])
 	}
+	# Last row is the "leftover"
 	propmat[nrow(propmat),] <- 1 - apply(propmat[-nrow(propmat),], MARGIN=2, FUN=sum)
 	propmat
 }
@@ -49,11 +50,20 @@ polygonprop <- function(
 	times, # Event times (until censoring or non-censored event)
 	xs = seq(0, 10, length.out=1000), # Time points in same unit	
 	leftover = "Alive", # Vector of names of variable that ought to be treated as 1-p instead of p
+	rows, # Naming or odering of rows; can be used to reorder polygons
 	...
 ){
 
 	# Create stacked proportions matrix
 	stackmat <- CompSurv:::stackprop(x = x, times = times, xs = xs, leftover = leftover)
+
+	print(stackmat[,1:10])
+	print(rows)
+	# If custom sorting of the rows is desired, use this
+	if(!missing(rows)){
+		rows <- rows[rows %in% rownames(stackmat)]
+		stackmat <- stackmat[rows,]
+	}
 
 	# Create a "zero" line
 	stackmat <- rbind(0, stackmat)
@@ -75,4 +85,3 @@ polygonprop <- function(
 	
 	polys
 }
-
