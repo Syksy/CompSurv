@@ -57,12 +57,17 @@ polygonprop <- function(
 	# Create stacked proportions matrix
 	stackmat <- CompSurv:::stackprop(x = x, times = times, xs = xs, leftover = leftover)
 
-	print(stackmat[,1:10])
-	print(rows)
 	# If custom sorting of the rows is desired, use this
 	if(!missing(rows)){
-		rows <- rows[rows %in% rownames(stackmat)]
-		stackmat <- stackmat[rows,]
+		print(rows)
+		if(!is.null(names(rows))){
+			rows <- names(rows)
+		}
+		rows <- rows[which(rows %in% rownames(stackmat))]
+		print(rows)
+		stackmat <- stackmat[match(rows, rownames(stackmat)),]
+		#rows <- rows[rownames(stackmat)]
+		print(rows)
 	}
 
 	# Create a "zero" line
@@ -71,10 +76,10 @@ polygonprop <- function(
 	polys <- list()
 	for(r in 2:nrow(stackmat)){
 		polys[[r-1]] <- rbind(
-			# Upper bound
-			apply(stackmat[seq(from=1, to=(r-1), by=1),,drop=FALSE], MARGIN=2, FUN=sum),
-			# Lower bound
-			apply(stackmat[seq(from=1, to=r, by=1),,drop=FALSE], MARGIN=2, FUN=sum)
+			# Upper bound (reverse y-axis)
+			1 - apply(stackmat[seq(from=1, to=(r-1), by=1),,drop=FALSE], MARGIN=2, FUN=sum),
+			# Lower bound (reverse y-axis)
+			1 - apply(stackmat[seq(from=1, to=r, by=1),,drop=FALSE], MARGIN=2, FUN=sum)
 		)
 	}
 

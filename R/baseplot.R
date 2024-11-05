@@ -14,11 +14,9 @@ propplot <- function(
 	# Named color vector provided, will use it
 	if(!is.null(names(cols))){
 		# Compute polygons with (reversed) color ordering, as the direction is from bottom up
-		polys <- CompSurv:::polygonprop(x = x, times = times, xs = xs, leftover = leftover, rows = rev(names(cols)))
+		polys <- CompSurv:::polygonprop(x = x, times = times, xs = xs, leftover = leftover, rows = names(cols))
 		# Match names
-		#cols <- cols[match(names(polys), names(cols))]
-		# Also sort the list of polygons so that the ordering of the provided names are used
-		#polys <- polys[names(cols)]
+		cols <- cols[match(names(polys), names(cols))]
 	}else{
 		polys <- CompSurv:::polygonprop(x = x, times = times, xs = xs, leftover = leftover)
 	}
@@ -43,6 +41,6 @@ propplot <- function(
 	#names(legend) <- c(names(polys), leftover)
 	names(legend) <- names(cols)
 
-	# Invisibly return the legend and propmat	
-	invisible(legend)	
+	# Invisibly return the legend and proportion polygons	
+	invisible(list(legend = legend, polys = polys))	
 }
