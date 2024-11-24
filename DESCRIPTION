@@ -1,10 +1,10 @@
 Package: CompSurv
 Title: Competing survival models and visualizations
-Version: 0.0.4
-Date: 2024-11-05
+Version: 0.1.0
+Date: 2024-11-23
 Authors@R: c(person("Teemu Daniel", "Laajala", email = "teelaa@utu.fi", 
         role = c("aut", "cre"), comment = c(ORCID = "0000-0002-7016-7354")))
-Description: To be added
+Description: Competing risk survival modelling, with a focus on visualizations.
 RoxygenNote: 7.3.1
 Encoding: UTF-8
 URL: https://github.com/Syksy/CompSurv

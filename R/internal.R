@@ -64,15 +64,13 @@ polygonprop <- function(
 			rows <- names(rows)
 		}
 		rows <- rows[which(rows %in% rownames(stackmat))]
-		print(rows)
 		stackmat <- stackmat[match(rows, rownames(stackmat)),]
-		#rows <- rows[rownames(stackmat)]
-		print(rows)
 	}
 
 	# Create a "zero" line
 	stackmat <- rbind(0, stackmat)
 
+	# Create a list of polygons with the corresponding vertices
 	polys <- list()
 	for(r in 2:nrow(stackmat)){
 		polys[[r-1]] <- rbind(
