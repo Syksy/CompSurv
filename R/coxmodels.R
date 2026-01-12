@@ -98,7 +98,7 @@ coxtab <- function(
 	if(inherits(obj, "coxph")){
 		cx <- coxambi.coxph(obj, ...)
 	}else if(inherits(obj, "formula")){
-		cx <- coxambi.coxph(obj, data=data, ...)	
+		cx <- coxambi.formula(obj, data=data, ...)	
 	}else{
 		stop(paste0("Invalid class for obj: ", class(obj)))
 	}
