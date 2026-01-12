@@ -4,7 +4,7 @@
 \alias{coxambi}
 \title{Fit multivariable Cox ph model for all covariates together with univariable model once per each covariate}
 \usage{
-coxambi(formula, data, ...)
+coxambi(obj, ...)
 }
 \description{
 Fit multivariable Cox ph model for all covariates together with univariable model once per each covariate
