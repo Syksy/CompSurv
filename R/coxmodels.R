@@ -30,15 +30,15 @@ coxambi.formula <- function(
 	
 	# Fit the multivariable model
 	coxmulti <- survival::coxph(formula, data = data, ...)
-	print(coxmulti)
+	#print(coxmulti)
 	
 	# Fit each univariable model separately
 	# Parse out the rhs
 	rhs <- attr(terms(formula, data = data), "term.labels")
 	# Parse out the lhs
 	lhs <- formula[[2]]
-	print(rhs)
-	print(lhs)
+	#print(rhs)
+	#print(lhs)
 	
 	# lapply across all right hand side term candidates
 	coxunis <- lapply(rhs, FUN=\(x){
@@ -78,14 +78,43 @@ coxdf <- function(
 	summ <- summary(model)
 	df <- data.frame(
 		term  = rownames(summ$coef),
-		coef  = unname(s$coef[,"coef"]),
-		hr    = unname(s$coef[,"exp(coef)"]),
-		se    = unname(s$coef[,"se(coef)"]),
-		z     = unname(s$coef[,"z"]),
-		p     = unname(s$coef[,"Pr(>|z|)"]),
-		dw95  = unname(s$coef[,"lower .95"]),
-		up95  = unname(s$coef[,"upper .95"]),
+		coef  = unname(summ$coef[,"coef"]),
+		hr    = unname(summ$coef[,"exp(coef)"]),
+		se    = unname(summ$coef[,"se(coef)"]),
+		z     = unname(summ$coef[,"z"]),
+		p     = unname(summ$coef[,"Pr(>|z|)"]),
 		stringsAsFactors = FALSE
 	)
 	df
+}
+
+#' Tabulate multivariable and single variable Cox fit results next to each other
+#' @export
+coxtab <- function(
+	obj,
+	data,
+	...
+){
+	if(inherits(obj, "coxph")){
+		cx <- coxambi.coxph(obj, ...)
+	}else if(inherits(obj, "formula")){
+		cx <- coxambi.coxph(obj, data=data, ...)	
+	}else{
+		stop(paste0("Invalid class for obj: ", class(obj)))
+	}
+
+	# Multivariable fit coef extraction	
+	multidf <- coxdf(cx[[1]])
+	colnames(multidf) <- paste0("multi_", colnames(multidf))
+	# Univariable fits coef extractions
+	unidfs <- do.call("rbind", lapply(cx[[2]], FUN=\(x){
+		tmp <- coxdf(x)
+		colnames(tmp) <- paste0("uni_", colnames(tmp))
+		tmp
+	}))[,-1]
+
+	# Take multivariable fits and univariable side-by-side
+	df <- cbind(multidf, unidfs)
+	rownames(df) <- df[,1]
+	df[,-1]
 }
