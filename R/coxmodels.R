@@ -91,8 +91,14 @@ coxdf <- function(
 #' Tabulate multivariable and single variable Cox fit results next to each other
 #' @export
 coxtab <- function(
+	# Model object; either formula or coxph
 	obj,
+	# If object is formula, data has to be supplied
 	data,
+	# Custom formatting; integer values depict preformatted choices
+	format,
+	# How many digits precision to use; named vector for different formattings
+	digits = c("coef" = 3, "p" = 3),
 	...
 ){
 	if(inherits(obj, "coxph")){
@@ -116,5 +122,31 @@ coxtab <- function(
 	# Take multivariable fits and univariable side-by-side
 	df <- cbind(multidf, unidfs)
 	rownames(df) <- df[,1]
-	df[,-1]
+	df <- df[,-1]
+	
+	if(missing(format)){
+		df
+	# Give as 'rowname ~ "Multi HR [0.95% CI], p", "Uni HR [0.95% CI], p"'
+	}else if(format == 1){
+		# Multivariable
+		multi_hrest <- round(df[,"multi_hr"], digits["coef"])
+		multi_low95 <- round(exp(df[,"multi_coef"] - 1.96 * df[,"multi_se"]), digits["coef"])
+		multi_top95 <- round(exp(df[,"multi_coef"] + 1.96 * df[,"multi_se"]), digits["coef"])
+		multi_p <- ifelse(df[,"multi_p"] < 0.001, "p<0.001", paste0("p=", round(df[,"multi_p"], digits["p"])))
+		
+		# Univariable(s)
+		uni_hrest <- round(df[,"uni_hr"], digits["coef"])
+		uni_low95 <- round(exp(df[,"uni_coef"] - 1.96 * df[,"uni_se"]), digits["coef"])
+		uni_top95 <- round(exp(df[,"uni_coef"] + 1.96 * df[,"uni_se"]), digits["coef"])
+		uni_p <- ifelse(df[,"uni_p"] < 0.001, "p<0.001", paste0("p=", round(df[,"uni_p"], digits["p"])))
+		
+		df_formatted <- data.frame(
+			multi = paste0(multi_hrest, " [", multi_low95, ", ", multi_top95, "], ", multi_p),
+			unis = paste0(uni_hrest, " [", uni_low95, ", ", uni_top95, "], ", uni_p)
+		)
+		rownames(df_formatted) <- rownames(df)
+		df_formatted
+	}else{
+		stop(paste0("Invalid 'format', should be an integer: ", format))
+	}
 }
