@@ -4,7 +4,7 @@
 \alias{coxtab}
 \title{Tabulate multivariable and single variable Cox fit results next to each other}
 \usage{
-coxtab(obj, data, ...)
+coxtab(obj, data, format, digits = c(coef = 3, p = 3), addN = TRUE, ...)
 }
 \description{
 Tabulate multivariable and single variable Cox fit results next to each other

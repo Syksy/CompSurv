@@ -29,22 +29,19 @@ coxambi.formula <- function(
 	if (missing(data)) stop("'data' must be provided.")
 	
 	# Fit the multivariable model
-	coxmulti <- survival::coxph(formula, data = data, ...)
-	#print(coxmulti)
-	
+	coxmulti <- survival::coxph(formula, data = data, model = TRUE, ...)
+
 	# Fit each univariable model separately
 	# Parse out the rhs
 	rhs <- attr(terms(formula, data = data), "term.labels")
 	# Parse out the lhs
 	lhs <- formula[[2]]
-	#print(rhs)
-	#print(lhs)
-	
+
 	# lapply across all right hand side term candidates
 	coxunis <- lapply(rhs, FUN=\(x){
 		# Make the formula
 		tmp_formula <- stats::as.formula(paste(deparse(lhs), "~", x))
-		survival::coxph(tmp_formula, data = data, ...)
+		survival::coxph(tmp_formula, data = data, model = TRUE, ...)
 	})
 	
 	# Return the multivariable fit and univariable fits
@@ -64,7 +61,7 @@ coxambi.coxph <- function(
 	if (is.null(obj$model)) {
 		stop("Need 'obj$model' for re-fitting. Refit with survival::coxph(..., model = TRUE).")
 	}
-	combs <- coxambi(obj$formula, data = obj$model)
+	combs <- coxambi.formula(obj$formula, data = obj$model)
 	combs
 }
 
@@ -99,6 +96,8 @@ coxtab <- function(
 	format,
 	# How many digits precision to use; named vector for different formattings
 	digits = c("coef" = 3, "p" = 3),
+	# Should effective N counts be added
+	addN = TRUE,
 	...
 ){
 	if(inherits(obj, "coxph")){
@@ -118,6 +117,30 @@ coxtab <- function(
 		colnames(tmp) <- paste0("uni_", colnames(tmp))
 		tmp
 	}))[,-1]
+
+	# Iterate across model terms and take into account their type (first element is LHS)
+	types <- attr(terms(cx[[1]]), "dataClasses")[-1]
+	# Iterate and aggregate Ns
+	Ns <- lapply(1:length(types), FUN=\(i){
+		if(types[i] %in% c("logical")){
+			#c(FALSE, TRUE)
+			# Should be proper logicals in order FALSE, TRUE
+			tab <- table(model.frame(cx[[1]])[,names(types)][,i])
+			names(tab) <- paste0(names(types)[i], names(tab))
+		}else if(types[i] %in% c("factor", "character")){
+			# Should be factor levels in the same order as levels(var)
+			tab <- table(model.frame(cx[[1]])[,names(types)][,i])
+			names(tab) <- paste0(names(types)[i], names(tab))
+		}else if(types[i] %in% c("numeric", "integer")){
+			tab <- sum(!is.na(model.frame(cx[[1]])[,names(types)][,i]))
+			names(tab) <- names(types)[i]
+		}else{
+			stop(paste0("Invalid dataClasses instance: ", types[i], " for variable index ", i))
+		}
+		tab
+	})
+	# Unlist all the levels of variables, with corresponding N counts
+	Ns <- unlist(Ns)
 
 	# Take multivariable fits and univariable side-by-side
 	df <- cbind(multidf, unidfs)
@@ -141,12 +164,31 @@ coxtab <- function(
 		uni_p <- ifelse(df[,"uni_p"] < 0.001, "p<0.001", paste0("p=", round(df[,"uni_p"], digits["p"])))
 		
 		df_formatted <- data.frame(
-			multi = paste0(multi_hrest, " [", multi_low95, ", ", multi_top95, "], ", multi_p),
-			unis = paste0(uni_hrest, " [", uni_low95, ", ", uni_top95, "], ", uni_p)
+			Multivariable = paste0(multi_hrest, " [", multi_low95, ", ", multi_top95, "], ", multi_p),
+			Univariable = paste0(uni_hrest, " [", uni_low95, ", ", uni_top95, "], ", uni_p)
 		)
 		rownames(df_formatted) <- rownames(df)
-		df_formatted
+
+		# If user wants to show N counts per level, add those as first column; also add additional reference rows
+		if(addN){
+			df_formatted <- data.frame(
+				# N counts per variable / level
+				N = Ns, 
+				# Multivariable fit summary
+				Multivariable = df_formatted[match(names(Ns), rownames(df_formatted)), "Multivariable"],
+				# Aggregated univariable fit summaries
+				Univariable = df_formatted[match(names(Ns), rownames(df_formatted)), "Univariable"]
+			)
+			# Empty cells (NAs) are on the reference rows for logical/factor variables
+			df_formatted[is.na(df_formatted)] <- "Reference"
+			# Use the extended names
+			rownames(df_formatted) <- names(Ns)
+		}
+
+		df <- df_formatted
 	}else{
 		stop(paste0("Invalid 'format', should be an integer: ", format))
 	}
+		
+	df 
 }
