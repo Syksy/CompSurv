@@ -1,7 +1,7 @@
 Package: CompSurv
-Title: Competing survival models and visualizations
-Version: 0.1.6
-Date: 2026-01-13
+Title: Competing risk and single end-point survival model tools
+Version: 0.1.7
+Date: 2026-01-19
 Authors@R: c(person("Teemu Daniel", "Laajala", email = "teelaa@utu.fi", 
         role = c("aut", "cre"), comment = c(ORCID = "0000-0002-7016-7354")))
 Description: Competing risk and misc survival modelling, with a focus on visualizations.
