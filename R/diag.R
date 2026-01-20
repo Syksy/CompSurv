@@ -94,7 +94,7 @@ collin_eigen <- function(
 	round(loadings, digits)
 }
 
-#' VIF for Cox model collinearity inspection
+#' VIF (Variance Inflation Factor) for Cox model collinearity inspection
 #' @export
 collin_vif <- function(
 	# coxph-object
@@ -105,5 +105,13 @@ collin_vif <- function(
 		stop("Provided fit should inherit class 'coxph' for a Cox proportional hazards model")
 	}
 
-	# TODO
+	# Omit LHS
+	dat <- model.frame(fit)[,-1]
+	# Build model matrix, omit intercept
+	X <- model.matrix(~ ., dat)[,-1]
+	v <- cor(X)
+	vifs <- diag(solve(v))
+	vifs
 }
+
+# TODO: GVIF
