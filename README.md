@@ -1,13 +1,17 @@
-# CompSurv - an R package for ompeting risk and misc survival modelling
+# CompSurv - an R package for competing risk and misc survival modelling
 
 ## Aim
 
-CompSurv is an R package that aims to offer tools for R users to handle competing risk analyses in survival modelling and more comprehensively handle also survival modelling in general. As such, the package is closely related to e.g. Fine-Gray models (competing risks), Cox models, and Kaplan-Meiers.
+_CompSurv_ is an R package that aims to offer tools for R users to handle competing risk analyses in survival modelling and more comprehensively handle also survival modelling in general. As such, the package is closely related to e.g. Fine-Gray models (competing risks), Cox models, and Kaplan-Meiers.
 Some key functionality includes model diagnostics (such as inspecting proportional hazards assumptions or colliearity of variables) and visualizations (such as 
 
 ## Dependencies
 
-CompSurv's intentionally kept lean, with only very few dependencies beyond ```base``` R, such as ```survival```.
+CompSurv's intentionally kept lean, with only very few dependencies beyond ```base``` R, such as ```survival```. Plots aim to be compatible with the base R graphics.
+
+## Author(s)
+
+Teemu Daniel Laajala (contact teelaa@utu.fi or daniel.laajala@helsinki.fi)
 
 ## Acknowledgements / citations / etc
 
@@ -25,3 +29,5 @@ CompSurv's been used (at least) in the following publications, for visualization
   publisher={Wiley Online Library}
 }
 ``` 
+
+To cite the package itself, use standard R package citation style (such as URL of this git repo and version of the package you used).
