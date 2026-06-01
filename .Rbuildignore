@@ -1,2 +1,4 @@
 ^.md$
 ^.Rmd$
+^.*\.Rproj$
+^\.Rproj\.user$
